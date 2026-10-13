@@ -1,11 +1,15 @@
 # BoardMap
 
+**BoardMap: A GIS-Based Machine Learning Boarding House Mapping and Recommendation System for Cabadbaran City**
+
 ## Summary
-BoardMap is a web-based system that helps people find and compare boarding places such as rooms, apartments, and dormitories. Users sign in, browse a list of places, search by name or area, and filter by category. The first checkpoint contains the Flutter Web starter: a Login screen and a Home screen built from reusable widgets. Sign-in is simulated and the places shown are sample data until the REST API is built.
+BoardMap centralizes the search, listing, and management of boarding houses, dormitories, and similar rentals in Cabadbaran City. It uses GIS mapping to show property locations and a K-Nearest Neighbors (KNN) recommendation engine to match seekers with suitable places by budget, distance, and amenities. Roles: Seeker, Owner, and Admin.
+
+This first checkpoint contains the Flutter Web starter: a Login screen and a Home screen built from reusable widgets. Sign-in is simulated and the places shown are sample data until the REST API is built.
 
 ## Current stack
 - Implemented: Flutter Web / Dart, Git and GitHub
-- Planned (not built yet): REST API (instructor-approved backend) and PostgreSQL
+- Planned (not built yet): FastAPI REST API, PostgreSQL + PostGIS, KNN recommendations (scikit-learn), Flutter packages such as Provider, http, and flutter_map
 
 ## Prerequisites
 Flutter SDK, Google Chrome, and Git.
