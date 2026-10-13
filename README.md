@@ -1,17 +1,39 @@
-# boardmap_project
+# BoardMap
 
-A new Flutter project.
+## Summary
+BoardMap is a web-based system that helps people find and compare boarding places such as rooms, apartments, and dormitories. Users sign in, browse a list of places, search by name or area, and filter by category. The first checkpoint contains the Flutter Web starter: a Login screen and a Home screen built from reusable widgets. Sign-in is simulated and the places shown are sample data until the REST API is built.
 
-## Getting Started
+## Current stack
+- Implemented: Flutter Web / Dart, Git and GitHub
+- Planned (not built yet): REST API (instructor-approved backend) and PostgreSQL
 
-This project is a starting point for a Flutter application.
+## Prerequisites
+Flutter SDK, Google Chrome, and Git.
 
-A few resources to get you started if this is your first Flutter project:
+## Run locally
+Run these from the project root (the folder that contains `pubspec.yaml`):
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```
+git clone https://github.com/Eons-07/boardmap_project.git
+cd boardmap_project
+flutter pub get
+flutter run -d chrome
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Run the widget tests with `flutter test`.
+
+## Project structure
+```
+lib/
+|-- main.dart          entry point
+|-- app.dart           MaterialApp, theme, first screen
+|-- screens/           login_screen.dart, home_screen.dart
+|-- widgets/           app_button.dart, app_text_field.dart
+|-- services/          future REST API clients
+|-- models/            future data models
+|-- routes/            future routing definitions
+`-- constants/         app-wide constants (never store secrets)
+```
+
+## First checkpoint
+Date: October 13, 2026 | Commit: de33f07
