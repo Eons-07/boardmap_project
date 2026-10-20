@@ -1,132 +1,193 @@
 import 'package:flutter/material.dart';
-import '../widgets/app_text_field.dart';
+import '../widgets/app_shell.dart';
+import '../widgets/contour_painter.dart';
 import 'login_screen.dart';
+import 'search_bh_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   final String email;
   const HomeScreen({super.key, required this.email});
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
 
-class _HomeScreenState extends State<HomeScreen> {
-  static const _categories = ['All', 'Rooms', 'Apartments', 'Dorms'];
-  static const _tabs = [(Icons.explore_outlined, Icons.explore, 'Explore'), (Icons.bookmark_border, Icons.bookmark, 'Saved'), (Icons.map_outlined, Icons.map, 'Map'), (Icons.person_outline, Icons.person, 'Profile')];
-  // Placeholder data: replace with results from your services layer.
+  // Sample data for the "Recommended for You" cards. Replace it with API results later.
   static const _places = <Map<String, String>>[
-    {'name': 'Sunrise Boarding House', 'area': 'Near the main gate', 'price': '1,800', 'type': 'Rooms'},
-    {'name': 'Mabini Residences', 'area': 'Poblacion, 5 min walk', 'price': '3,500', 'type': 'Apartments'},
-    {'name': 'Scholars Dormitory', 'area': 'Campus road', 'price': '1,200', 'type': 'Dorms'},
-    {'name': 'Green Lane Rooms', 'area': 'Riverside, 10 min ride', 'price': '2,100', 'type': 'Rooms'},
-    {'name': 'Harbor View Flats', 'area': 'City center', 'price': '4,200', 'type': 'Apartments'},
+    {'name': 'Sunrise Boarding House', 'area': 'Barangay San Isidro', 'price': '3,000', 'rating': '4.8', 'reviews': '24'},
+    {'name': 'Campus Dormitory', 'area': 'Barangay 1 (Poblacion)', 'price': '2,500', 'rating': '4.6', 'reviews': '18'},
+    {'name': 'Greenview Boarding House', 'area': 'Barangay Santa Cruz', 'price': '2,500', 'rating': '4.7', 'reviews': '31'},
+    {'name': 'Riverside Dorm', 'area': 'Barangay Langagan', 'price': '2,800', 'rating': '4.7', 'reviews': '21'},
   ];
-  final _search = TextEditingController();
-  int _category = 0, _tab = 0;
-
-  @override
-  void dispose() {
-    _search.dispose();
-    super.dispose();
-  }
 
   String get _name {
-    final n = widget.email.split('@').first;
+    final n = email.split('@').first;
     return n.isEmpty ? 'there' : n[0].toUpperCase() + n.substring(1);
   }
 
-  List<Map<String, String>> get _filtered {
-    final q = _search.text.trim().toLowerCase();
-    return _places.where((p) => (_category == 0 || p['type'] == _categories[_category]) && (q.isEmpty || p['name']!.toLowerCase().contains(q) || p['area']!.toLowerCase().contains(q))).toList();
+  String get _greeting {
+    final hour = DateTime.now().hour;
+    return hour < 12 ? 'Good morning' : (hour < 18 ? 'Good afternoon' : 'Good evening');
   }
 
-  void _logout() => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const LoginScreen()));
+  void _openSearch(BuildContext context) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SearchBhScreen(userName: _name)));
+
+  void _comingSoon(BuildContext context, String page) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$page is coming soon')));
+
+  void _logout(BuildContext context) => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const LoginScreen()));
+
+  void _onNav(BuildContext context, int i) {
+    if (i == 1) {
+      _openSearch(context);
+    } else if (i != 0) {
+      _comingSoon(context, AppShell.items[i].$3);
+    }
+  }
+
+  Widget _hero(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF1E3A8A), Color(0xFF1D4ED8), Color(0xFF0E7490)])),
+      child: CustomPaint(
+        painter: ContourPainter(),
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('$_greeting, $_name!', style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 8),
+            Text('Find your next home in Cabadbaran City. Explore places, compare prices, and get personalized recommendations.', style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 15, height: 1.4)),
+            const SizedBox(height: 20),
+            Row(children: [
+              Expanded(
+                child: Material(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () => _openSearch(context),
+                    child: SizedBox(height: 52, child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Row(children: [
+                      Icon(Icons.search, color: scheme.onSurfaceVariant),
+                      const SizedBox(width: 10),
+                      Expanded(child: Text('Search by location, barangay, or boarding house name...', overflow: TextOverflow.ellipsis, style: TextStyle(color: scheme.onSurfaceVariant))),
+                    ]))),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              FilledButton(onPressed: () => _openSearch(context), style: FilledButton.styleFrom(minimumSize: const Size(100, 52), backgroundColor: Colors.white, foregroundColor: scheme.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Search', style: TextStyle(fontWeight: FontWeight.w700))),
+            ]),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _actions(BuildContext context) => LayoutBuilder(builder: (context, box) {
+        final cols = box.maxWidth >= 700 ? 3 : 1, w = (box.maxWidth - 16 * (cols - 1)) / cols;
+        final cards = [
+          (Icons.map_outlined, 'Explore Map', 'View all boarding houses on the map', () => _comingSoon(context, 'Map')),
+          (Icons.auto_awesome, 'Get Recommendations', 'Find places that match your preferences', () => _openSearch(context)),
+          (Icons.favorite_border, 'Save Favorites', 'Keep track of your favorite listings', () => _comingSoon(context, 'My Favorites')),
+        ];
+        return Wrap(spacing: 16, runSpacing: 16, children: [for (final c in cards) SizedBox(width: w, child: _ActionCard(icon: c.$1, title: c.$2, subtitle: c.$3, onTap: c.$4))]);
+      });
+
+  Widget _recommended(BuildContext context) => LayoutBuilder(builder: (context, box) {
+        final cols = box.maxWidth >= 900 ? 4 : (box.maxWidth >= 560 ? 2 : 1), w = (box.maxWidth - 16 * (cols - 1)) / cols;
+        return Wrap(spacing: 16, runSpacing: 16, children: [for (final p in _places) SizedBox(width: w, child: _PlaceCard(place: p))]);
+      });
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Scaffold(
-      body: Column(children: [
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(color: scheme.primary, borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28))),
-          child: SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 12, 12, 24),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [
-                  Expanded(child: Text('Hello, $_name', style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -0.5))),
-                  IconButton(tooltip: 'Log out', onPressed: _logout, icon: const Icon(Icons.logout, color: Colors.white)),
-                ]),
-                Text('Where do you want to stay?', style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 15)),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: AppTextField(controller: _search, hint: 'Search by name or area', icon: Icons.search, onChanged: (_) => setState(() {})),
-                ),
+    return AppShell(
+      selected: 0,
+      userName: _name,
+      onSelect: (i) => _onNav(context, i),
+      onLogout: () => _logout(context),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1000),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _hero(context),
+              const SizedBox(height: 20),
+              _actions(context),
+              const SizedBox(height: 28),
+              Row(children: [
+                const Expanded(child: Text('Recommended for You', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800))),
+                TextButton(onPressed: () => _openSearch(context), child: const Text('View All')),
               ]),
-            ),
+              const SizedBox(height: 12),
+              _recommended(context),
+            ]),
           ),
         ),
-        Expanded(
-          child: _tab != 0
-              ? Center(child: Text('${_tabs[_tab].$3} is coming soon', style: TextStyle(color: scheme.onSurfaceVariant)))
-              : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  SizedBox(
-                    height: 64,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                      itemCount: _categories.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
-                      itemBuilder: (_, i) => ChoiceChip(label: Text(_categories[i]), selected: _category == i, onSelected: (_) => setState(() => _category = i), showCheckmark: false),
-                    ),
-                  ),
-                  Expanded(
-                    child: _filtered.isEmpty
-                        ? Center(child: Text('No places match your search.\nTry another name or area.', textAlign: TextAlign.center, style: TextStyle(color: scheme.onSurfaceVariant)))
-                        : ListView.separated(
-                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                            itemCount: _filtered.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 12),
-                            itemBuilder: (_, i) => _PlaceTile(place: _filtered[i]),
-                          ),
-                  ),
-                ]),
-        ),
-      ]),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _tab,
-        onDestinationSelected: (i) => setState(() => _tab = i),
-        destinations: [for (final t in _tabs) NavigationDestination(icon: Icon(t.$1), selectedIcon: Icon(t.$2), label: t.$3)],
       ),
     );
   }
 }
 
-class _PlaceTile extends StatelessWidget {
+class _ActionCard extends StatelessWidget {
+  final IconData icon;
+  final String title, subtitle;
+  final VoidCallback onTap;
+  const _ActionCard({required this.icon, required this.title, required this.subtitle, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: BorderSide(color: scheme.outlineVariant)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(children: [
+            CircleAvatar(radius: 24, backgroundColor: scheme.secondaryContainer, child: Icon(icon, color: scheme.primary)),
+            const SizedBox(width: 14),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 2),
+              Text(subtitle, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13)),
+            ])),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+class _PlaceCard extends StatelessWidget {
   final Map<String, String> place;
-  const _PlaceTile({required this.place});
+  const _PlaceCard({required this.place});
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: scheme.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: scheme.outlineVariant)),
-      child: Row(children: [
-        Container(height: 56, width: 56, decoration: BoxDecoration(color: scheme.secondaryContainer, borderRadius: BorderRadius.circular(12)), child: Icon(Icons.home_work_outlined, color: scheme.primary)),
-        const SizedBox(width: 14),
-        Expanded(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(color: scheme.surface, borderRadius: BorderRadius.circular(14), border: Border.all(color: scheme.outlineVariant)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Stack(children: [
+          Container(height: 120, width: double.infinity, color: scheme.secondaryContainer, child: Icon(Icons.home_work_outlined, size: 40, color: scheme.primary)), // photo placeholder
+          const Positioned(top: 8, right: 8, child: CircleAvatar(radius: 16, backgroundColor: Colors.white, child: Icon(Icons.favorite_border, size: 18))),
+        ]),
+        Padding(
+          padding: const EdgeInsets.all(12),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(place['name']!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+            Text(place['name']!, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
             const SizedBox(height: 2),
             Text(place['area']!, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 13)),
+            const SizedBox(height: 8),
+            Text('₱${place['price']} / month', style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w800)),
             const SizedBox(height: 6),
-            Text('₱${place['price']} / month', style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w700)),
+            Row(children: [
+              Icon(Icons.star, size: 16, color: scheme.tertiary),
+              const SizedBox(width: 4),
+              Text('${place['rating']} (${place['reviews']} reviews)', style: const TextStyle(fontSize: 12)),
+            ]),
           ]),
         ),
-        IconButton(onPressed: () {}, icon: const Icon(Icons.bookmark_border)),
       ]),
     );
   }
