@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// The four states a data screen can be in (from the lesson: loading, success, error, plus idle before any action).
 enum UiStatus { idle, loading, success, error }
 
 class StatusBanner extends StatelessWidget {

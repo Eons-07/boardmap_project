@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-/// Soft topographic contour lines used as a background pattern (a stand-in for the aerial photo in the mockup).
 class ContourPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {

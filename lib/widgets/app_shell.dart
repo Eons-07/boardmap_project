@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_logo.dart';
 
-/// Page frame shared by the signed-in screens: top bar, sidebar (wide screens) or drawer (narrow screens).
 class AppShell extends StatelessWidget {
   static const items = [
     (Icons.home_outlined, Icons.home, 'Home'),
@@ -12,11 +11,11 @@ class AppShell extends StatelessWidget {
     (Icons.person_outline, Icons.person, 'My Profile'),
   ];
   final int selected;
-  final String userName;
+  final String userName, userRole;
   final ValueChanged<int> onSelect;
   final VoidCallback? onLogout;
   final Widget body;
-  const AppShell({super.key, required this.selected, required this.userName, required this.onSelect, required this.body, this.onLogout});
+  const AppShell({super.key, required this.selected, required this.userName, required this.userRole, required this.onSelect, required this.body, this.onLogout});
 
   Widget _nav(BuildContext context, ValueChanged<int> onTap) {
     final scheme = Theme.of(context).colorScheme;
@@ -28,7 +27,7 @@ class AppShell extends StatelessWidget {
             dense: true,
             selected: i == selected,
             selectedTileColor: scheme.secondaryContainer,
-            selectedColor: scheme.primary,
+            selectedColor: scheme.secondary,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             leading: Icon(i == selected ? items[i].$2 : items[i].$1),
             title: Text(items[i].$3, style: const TextStyle(fontWeight: FontWeight.w600)),
@@ -45,7 +44,7 @@ class AppShell extends StatelessWidget {
         const SizedBox(width: 8),
         Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(userName, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-          Text('Seeker', style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant)),
+          Text(userRole, style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant)),
         ]),
       ],
       if (onLogout != null) const Icon(Icons.keyboard_arrow_down),
@@ -57,7 +56,7 @@ class AppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return LayoutBuilder(builder: (context, box) {
-      final wide = box.maxWidth >= 900; // sidebar on wide screens, drawer on narrow ones
+      final wide = box.maxWidth >= 900; 
       return Scaffold(
         drawer: wide ? null : Drawer(child: SafeArea(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Padding(padding: const EdgeInsets.all(20), child: AppLogo(color: scheme.primary)),
@@ -71,7 +70,7 @@ class AppShell extends StatelessWidget {
           automaticallyImplyLeading: false,
           leading: wide ? null : Builder(builder: (ctx) => IconButton(tooltip: 'Menu', icon: const Icon(Icons.menu), onPressed: () => Scaffold.of(ctx).openDrawer())),
           titleSpacing: wide ? 24 : 0,
-          title: AppLogo(color: scheme.primary, size: 22),
+          title: AppLogo(color: scheme.primary, size: 20),
           actions: [
             IconButton(tooltip: 'Notifications', onPressed: () {}, icon: const Badge(smallSize: 9, child: Icon(Icons.notifications_none))),
             const SizedBox(width: 8),

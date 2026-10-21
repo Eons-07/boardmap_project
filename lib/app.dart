@@ -6,12 +6,24 @@ class BoardMapApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const blue = Color(0xFF1D4ED8), ink = Color(0xFF0F172A), mist = Color(0xFFF4F7FB), line = Color(0xFFE2E8F0);
-    final scheme = ColorScheme.fromSeed(seedColor: blue).copyWith(primary: blue, onPrimary: Colors.white, onSurface: ink, surface: Colors.white, tertiary: const Color(0xFFF59E0B), secondaryContainer: const Color(0xFFDBEAFE), onSecondaryContainer: blue, outlineVariant: line);
+    const forest = Color(0xFF244C3A), teal = Color(0xFF367F78), amber = Color(0xFFD99A45), ivory = Color(0xFFF7F4EC);
+    final scheme = ColorScheme.fromSeed(seedColor: forest).copyWith(
+      primary: forest,
+      onPrimary: Colors.white,
+      secondary: teal,
+      onSecondary: Colors.white,
+      tertiary: amber,
+      onSurface: const Color(0xFF1F2A24),
+      onSurfaceVariant: const Color(0xFF5B6B63),
+      surface: const Color(0xFFFCFAF5),
+      secondaryContainer: const Color(0xFFDCEBE8),
+      onSecondaryContainer: forest,
+      outlineVariant: const Color(0xFFE4DFD0),
+    );
     return MaterialApp(
-      title: 'BoardMap',
+      title: 'BoardMap: CBR',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true, colorScheme: scheme, scaffoldBackgroundColor: mist),
+      theme: ThemeData(useMaterial3: true, colorScheme: scheme, scaffoldBackgroundColor: ivory),
       home: const LoginScreen(),
     );
   }
